@@ -454,20 +454,6 @@ class TestMakeReport(unittest.TestCase):
                          'A description for the first plot.')
         self.assertNotIn('description', json_index['second'])
 
-    def test_make_report_rejects_unknown_description(self):
-        with self.assertRaisesRegex(ValueError, 'not in the collection'):
-            Visualization.make_report(
-                self.template,
-                {'first': self.viz1},
-                descriptions={'missing': 'This visualization does not exist.'})
-
-    def test_make_report_rejects_non_text_description(self):
-        with self.assertRaisesRegex(TypeError, 'must be plain text'):
-            Visualization.make_report(
-                self.template,
-                {'first': self.viz1},
-                descriptions={'first': ['This is not plain text.']})
-
     def test_make_report_nested_hoist(self):
         # create an inner report from viz2 alone
         # create visualization via dummy plugin
@@ -525,6 +511,26 @@ class TestMakeReport(unittest.TestCase):
                          'A nested leaf description.')
         self.assertEqual(json_index['nested']['description'],
                          'A description for the nested report.')
+
+    def test_make_report_rejects_unknown_description(self):
+        with self.assertRaisesRegex(ValueError, 'not in the collection'):
+            Visualization.make_report(
+                self.template,
+                {'first': self.viz1},
+                descriptions={'missing': 'This visualization does not exist.'})
+
+    def test_make_report_rejects_non_text_description(self):
+        with self.assertRaisesRegex(TypeError, 'must be plain text'):
+            Visualization.make_report(
+                self.template,
+                {'first': self.viz1},
+                descriptions={'first': ['This is not plain text.']})
+
+    def test_make_report_without_descriptions(self):
+        report = Visualization.make_report(
+            self.template, {'first': self.viz1})
+
+        self.assertIsInstance(report, Visualization)
 
 if __name__ == '__main__':
     unittest.main()
