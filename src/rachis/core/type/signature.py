@@ -24,9 +24,10 @@ from .visualization import Visualization
 from . import meta
 from .util import (is_semantic_type, is_collection_type, is_primitive_type,
                    parse_primitive, contains_generic_base)
+from ..path import OutPath
 from ..util import ImmutableBase, checksum, create_collection_name
 from rachis.plugin.context import IContext
-
+from ...plugin import DirectoryFormat
 
 VALID_CTX_ANNOTATIONS = (
     IContext,
@@ -666,6 +667,15 @@ class PipelineSignature:
         # ResultCollection outside of this method.
         if is_collection_type(qiime_type):
             qiime_type = qiime_type.fields[0]
+
+        # A writable DirectoryFormat backed by an OutPath was allocated by
+        # Rachis for this action's output. The action has returned it, so it is
+        # safe for artifact creation to consume the temporary directory rather
+        # than copy it. Inputs and externally supplied paths are InPaths and
+        # retain the default behavior of preserving their source data.
+        if isinstance(view, DirectoryFormat) and \
+                isinstance(view.path, OutPath):
+            view.path._user_owned = False
 
         artifact = rachis.sdk.Artifact._from_view(
             qiime_type, view, spec.view_type, prov)

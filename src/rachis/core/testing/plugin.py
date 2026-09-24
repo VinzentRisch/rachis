@@ -42,7 +42,8 @@ from .method import (concatenate_ints, split_ints, merge_mappings,
                      identity_with_numeric_metadata_column,
                      identity_with_optional_metadata,
                      identity_with_optional_metadata_column,
-                     params_only_method, no_input_method, deprecated_method,
+                     params_only_method, no_input_method, return_direct_dirfmt,
+                     return_input_dirfmt, deprecated_method,
                      optional_artifacts_method, long_description_method,
                      docstring_order_method, variadic_input_method,
                      unioned_primitives, type_match_list_and_set, union_inputs,
@@ -286,6 +287,30 @@ dummy_plugin.methods.register_function(
                 'have one more element than the left.',
     citations=[
         citations['witcombe2006sword'], citations['reimers2012response']]
+)
+
+dummy_plugin.methods.register_function(
+    function=return_direct_dirfmt,
+    inputs={},
+    parameters={},
+    outputs={
+        'output': IntSequence1
+    },
+    name='Return a directly-created directory format',
+    description='This method returns a directory format it creates directly.'
+)
+
+dummy_plugin.methods.register_function(
+    function=return_input_dirfmt,
+    inputs={
+        'dirfmt': IntSequence1
+    },
+    parameters={},
+    outputs={
+        'output': IntSequence1
+    },
+    name='Return an input directory format',
+    description='This method returns its input directory format.'
 )
 
 dummy_plugin.methods.register_function(
