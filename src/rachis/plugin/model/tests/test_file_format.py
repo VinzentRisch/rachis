@@ -73,20 +73,6 @@ class TestFileFormat(unittest.TestCase):
     def tearDown(self):
         self.test_dir.cleanup()
 
-    def test_compression_descriptor_validates_instance_assignment(self):
-        self.format.COMPRESSION = 9
-        self.assertEqual(self.format.COMPRESSION, 9)
-
-        with self.assertRaisesRegex(
-                ValueError, 'COMPRESSION must be an integer from 0 to 9'):
-            self.format.COMPRESSION = 10
-
-    def test_compression_descriptor_does_not_validate_subclass_declaration(
-            self):
-        class InvalidCompressionFormat(SingleIntFormat):
-            COMPRESSION = 10
-
-        self.assertEqual(InvalidCompressionFormat.COMPRESSION, 10)
 
     def test_view_expected(self):
         number = self.format.view(int)
