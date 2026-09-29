@@ -16,8 +16,8 @@ from .base import FormatBase, ValidationError, _check_validation_level
 class _FileFormat(FormatBase, metaclass=abc.ABCMeta):
 
     # Valid levels are 0 through 9. _ZipArchive.save passes 1 through 9 to
-    # ZipFile.write as ``compresslevel``; 1 is fastest and 9 makes the
-    # smallest archive. 0 selects ``ZIP_STORED``, leaving the file uncompressed.
+    # ZipFile.write as `compresslevel`; 1 is fastest and 9 makes the
+    # smallest archive. 0 selects `ZIP_STORED`, leaving the file uncompressed.
     COMPRESSION = None
 
     @classmethod
