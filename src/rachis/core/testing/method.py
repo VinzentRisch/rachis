@@ -15,6 +15,7 @@ import typing
 import rachis
 import rachis.core.type as qtype
 from rachis.core.exceptions import RachisWarning
+from rachis.core.testing.format import IntSequenceDirectoryFormat
 
 
 # Artifacts and parameters.
@@ -62,6 +63,18 @@ def unioned_primitives(foo: int, bar: str = 'auto_bar') -> dict:
 # No input artifacts or parameters.
 def no_input_method() -> dict:
     return {'foo': 42}
+
+
+def return_direct_dirfmt() -> IntSequenceDirectoryFormat:
+    dirfmt = IntSequenceDirectoryFormat()
+    with dirfmt.file.path_maker().open(mode='w') as fh:
+        fh.write('1\n2\n3\n')
+    return dirfmt
+
+
+def return_input_dirfmt(
+        dirfmt: IntSequenceDirectoryFormat) -> IntSequenceDirectoryFormat:
+    return dirfmt
 
 
 def deprecated_method() -> dict:
