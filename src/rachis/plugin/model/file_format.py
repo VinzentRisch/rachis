@@ -24,11 +24,10 @@ class _FileFormat(FormatBase, metaclass=abc.ABCMeta):
     def _validate_compression(cls):
         level = cls.COMPRESSION
         if level is not None and (
-                isinstance(level, bool) or not isinstance(level, int)
-                or not 0 <= level <= 9):
+                type(level) is not int or not 0 <= level <= 9):
             raise ValueError(
-                f'{cls.__name__}.COMPRESSION must be an integer from 0 to 9, '
-                f'not {level!r}.')
+                f'{cls.__name__}.COMPRESSION must be an integer from 0 to 9 or'
+                f' None, not {level!r}.')
 
     def validate(self, level='max'):
         _check_validation_level(level)
