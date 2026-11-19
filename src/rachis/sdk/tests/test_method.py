@@ -10,6 +10,7 @@ import collections
 import concurrent.futures
 import inspect
 import unittest
+import unittest.mock
 import uuid
 
 import rachis.plugin
@@ -19,6 +20,7 @@ from rachis.sdk import Artifact, Method, Results, ResultCollection
 
 from rachis.core.testing.method import (concatenate_ints, merge_mappings,
                                         params_only_method, no_input_method)
+from rachis.core.path import OwnedPath
 from rachis.core.testing.type import (
     IntSequence1, IntSequence2, SingleInt, Mapping)
 from rachis.core.testing.util import get_dummy_plugin
@@ -338,6 +340,30 @@ class TestMethod(unittest.TestCase):
         self.assertIsInstance(result, Results)
         self.assertEqual(result.left.view(list), [0, 42])
         self.assertEqual(result.right.view(list), [-2, 43, 6])
+
+    def test_direct_directory_format_output_is_moved(self):
+        return_direct_dirfmt = self.plugin.methods['return_direct_dirfmt']
+
+        with unittest.mock.patch.object(
+                OwnedPath, '_copy_dir_or_file', autospec=True,
+                side_effect=OwnedPath._copy_dir_or_file) as copy:
+            result, = return_direct_dirfmt()
+
+        copy.assert_not_called()
+        self.assertEqual(result.view(list), [1, 2, 3])
+
+    def test_input_directory_format_output_is_copied(self):
+        return_input_dirfmt = self.plugin.methods['return_input_dirfmt']
+        input_artifact = Artifact.import_data(IntSequence1, [1, 2, 3])
+
+        with unittest.mock.patch.object(
+                OwnedPath, '_copy_dir_or_file', autospec=True,
+                side_effect=OwnedPath._copy_dir_or_file) as copy:
+            result, = return_input_dirfmt(input_artifact)
+
+        copy.assert_called_once()
+        self.assertEqual(input_artifact.view(list), [1, 2, 3])
+        self.assertEqual(result.view(list), [1, 2, 3])
 
     def test_call_with_no_parameters(self):
         merge_mappings = self.plugin.methods['merge_mappings']

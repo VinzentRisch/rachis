@@ -22,6 +22,7 @@ from rachis.sdk.proxy import ProxyResult
 from rachis.core.annotate import Signature
 import rachis.core.archive as archive
 import rachis.core.exceptions as exceptions
+from rachis.core.path import OwnedPath
 
 from rachis.core.testing.format import IntSequenceDirectoryFormat
 from rachis.core.testing.type import (FourInts, SingleInt, IntSequence1,
@@ -94,6 +95,20 @@ class TestResult(unittest.TestCase, ArchiveTestingMixin):
         self.assertEqual(artifact.type, FourInts)
         self.assertEqual(artifact.uuid, saved_artifact.uuid)
         self.assertEqual(artifact.view(list), [-1, 42, 0, 43])
+
+    def test_import_data_preserves_direct_directory_format(self):
+        dirfmt = IntSequenceDirectoryFormat()
+        with dirfmt.file.path_maker().open(mode='w') as fh:
+            fh.write('1\n2\n3\n')
+
+        with unittest.mock.patch.object(
+                OwnedPath, '_copy_dir_or_file', autospec=True,
+                side_effect=OwnedPath._copy_dir_or_file) as copy:
+            artifact = Artifact.import_data(IntSequence1, dirfmt)
+
+        copy.assert_called_once()
+        self.assertTrue(dirfmt.path.exists())
+        self.assertEqual(artifact.view(list), [1, 2, 3])
 
     def test_load_visualization(self):
         saved_visualization = Visualization._from_data_dir(
